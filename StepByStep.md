@@ -103,6 +103,79 @@ function uploadProfilePicture() {
       }).catch(error => console.log(error));
 }
 ```
-5. 
+
+## record profile url on upload
+1. init firebase functions
+2. Bump up billing plan for blaze
+3. Create new file *add-profileurl.ts*. Add following code.
+``` javascript
+import * as admin from 'firebase-admin';
+
+export async function addProfileUrl(url: string): Promise<void> {
+    if(url) {
+        const userId = getUserId(url);
+        await updateProfilePicUrl(userId, url);
+    } else {
+        throw new Error('profile pic url cannot be empty.');
+    }
+
+}
+
+function getUserId(url: string): string {
+    const urlParts = url.split('/');
+    if(urlParts.length > 1) {
+        const filenameParts = urlParts[1].split('.');
+        if(filenameParts.length > 1) {
+            return filenameParts[0];
+        }
+    }
+    throw new Error('profile pic url is not in correct format.');
+}
+
+async function updateProfilePicUrl(userId: string, url: string) : Promise<void> {
+    const db = admin.firestore();
+    await db.collection('UserProfiles').doc(userId).set({'profilePicUrl': url}, { merge: true });
+}
+```
+
+4. Add following functions to index.ts in folder functions/src.
+``` javascript
+import * as admin from 'firebase-admin';
+import { addProfileUrl } from './add-profileurl';
+
+export const addProfilePicUrl = functions.storage.object().onFinalize(async (object) => {
+    console.log(object.name);
+    await addProfileUrl(object.name ? object.name: '');
+});
+
+
+
+```
+5. One might need to add following config to **.eslintrc.js** under **settings** section, incase the error 
+``` error  Unable to resolve path to module ``` 
+occurs when building the app.
+``` javascript
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    }
+```
+
+## Render profile pic on frontend
+1. Add and image tag
+2. Add following js to main.js
+``` javascript
+function setProfilePicUrl(profilePicUrl) {
+    if(profilePicUrl){
+        console.log(profilePicUrl);
+        storage.ref().child(profilePicUrl).getDownloadURL()
+            .then(url => { 
+                console.log(url);
+                profilePicElement.src = url;
+            });
+    }
+}
+```
 
 

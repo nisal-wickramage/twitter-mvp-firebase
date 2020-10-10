@@ -1,0 +1,7 @@
+#profilepicture {
+    display: block;
+    max-width:200;
+    max-height:100px;
+    width: auto;
+    height: auto;
+}

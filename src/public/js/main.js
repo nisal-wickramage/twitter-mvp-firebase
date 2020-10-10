@@ -18,6 +18,7 @@ var lastname = document.getElementById('lastname');
 var dateofbirth = document.getElementById('dateofbirth');
 var userprofile = document.getElementById('userprofile');
 var fileUploadElement = document.getElementById('uploadProfilePic');
+var profilePicElement = document.getElementById('profilepicture');
 
 
 signInBtn.onclick = () => auth.signInWithPopup(provider);
@@ -34,6 +35,9 @@ function initProfileInfo(uid){
             firstname.value = data.FirstName === undefined ? '': data.FirstName;
             lastname.value = data.LastName === undefined ? '': data.LastName;
             dateofbirth.value = data.DateOfBirth === undefined ? '': data.DateOfBirth;
+            if(data.profilePicUrl) { 
+                setProfilePicUrl(data.profilePicUrl);
+            }
         }
     });
 }
@@ -45,7 +49,7 @@ function updateData(uid){
         LastName: lastname.value,
         DateOfBirth: dateofbirth.value
     };
-    db.collection('UserProfiles').doc(uid).set(profileData).then(()=> console.log('updated!'));
+    db.collection('UserProfiles').doc(uid).set(profileData, { merge: true }).then(()=> console.log('updated!'));
 }
 
 function setProfilePicture(uid) {
@@ -56,8 +60,20 @@ function uploadProfilePicture() {
     let file = this.files[0];
     let profilePicRef = storage.ref().child(`profilepic/${userRef.uid}.jpg`);
     profilePicRef.put(file).then(function(snapshot) {
-        console.log('Uploaded a blob or file!');
+        console.log(snapshot.metadata.fullpath);
+        setProfilePicUrl(snapshot.metadata.fullpath);
       }).catch(error => console.log(error));
+}
+
+function setProfilePicUrl(profilePicUrl) {
+    if(profilePicUrl){
+        console.log(profilePicUrl);
+        storage.ref().child(profilePicUrl).getDownloadURL()
+            .then(url => { 
+                console.log(url);
+                profilePicElement.src = url;
+            });
+    }
 }
 
 auth.onAuthStateChanged(user => {
