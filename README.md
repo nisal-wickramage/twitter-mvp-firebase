@@ -8,7 +8,6 @@ This repo holds the source code and tests for application covering MVP scope fea
 
 ### As a registered user
 * Update personal information as a registered user.
-* Tweet, Update tweet, Delete tweet.
-* Home feed.
-* Follow other users
+* Tweet
+* Home feed(All tweets).
  

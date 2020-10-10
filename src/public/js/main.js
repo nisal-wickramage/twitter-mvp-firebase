@@ -19,13 +19,24 @@ var dateofbirth = document.getElementById('dateofbirth');
 var userprofile = document.getElementById('userprofile');
 var fileUploadElement = document.getElementById('uploadProfilePic');
 var profilePicElement = document.getElementById('profilepicture');
+var tweetTextbox = document.getElementById('tweettext');
+var tweetButton = document.getElementById('tweet');
 
 
 signInBtn.onclick = () => auth.signInWithPopup(provider);
 
 signOutBtn.onclick = () => auth.signOut();
 
+tweetButton.onclick = () => saveTweet();
+
 fileUploadElement.addEventListener("change", uploadProfilePicture, false);
+
+function saveTweet() {
+    if(tweetTextbox.value) {
+        var tweet = {TweetText: tweetTextbox.value, UserId: userRef.uid};
+        db.collection('Tweets').add(tweet).then(()=> console.log('tweeted!'));
+    }
+}
 
 function initProfileInfo(uid){
     db.collection('UserProfiles').doc(uid).get().then(profile => {

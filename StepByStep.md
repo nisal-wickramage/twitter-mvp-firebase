@@ -178,4 +178,27 @@ function setProfilePicUrl(profilePicUrl) {
 }
 ```
 
+## CRUD Tweets
+1. Create root level collection 'Tweets'.
+    - Schema
+        - UserId: string
+        - TweetText: string
+2. Add following html elements.
+```  html
+        <input id="tweettext" type="text"/> 
+        <button id="tweet">Tweet</button>
+```
+3. Add event handler for tweet button.
+``` javascript
+var tweetTextbox = document.getElementById('tweettext');
+var tweetButton = document.getElementById('tweet');
 
+tweetButton.onclick = () => saveTweet();
+
+function saveTweet() {
+    if(tweetTextbox.value) {
+        var tweet = {TweetText: tweetTextbox.value, UserId: userRef.uid};
+        db.collection('Tweets').add(tweet).then(()=> console.log('tweeted!'));
+    }
+}
+```
