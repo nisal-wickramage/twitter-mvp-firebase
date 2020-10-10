@@ -178,7 +178,7 @@ function setProfilePicUrl(profilePicUrl) {
 }
 ```
 
-## CRUD Tweets
+## Add Tweets
 1. Create root level collection 'Tweets'.
     - Schema
         - UserId: string
@@ -200,5 +200,30 @@ function saveTweet() {
         var tweet = {TweetText: tweetTextbox.value, UserId: userRef.uid};
         db.collection('Tweets').add(tweet).then(()=> console.log('tweeted!'));
     }
+}
+```
+
+## Tweeter feed
+1. Add html element
+``` html
+<div id="tweetfeed"></div>
+```
+2. Add following javascript 
+``` javascript
+var tweetFeed = document.getElementById('tweetfeed');
+
+function loadTweetFeed(uid) {
+    db.collection('Tweets')
+        .orderBy('CreatedDate', 'desc')
+        .limit(100)
+        .get()
+        .then(docs => {
+            var tweethtml = '';
+            docs.forEach(doc => {
+                var tweet = doc.data();
+                tweethtml = `${tweethtml}<p>${tweet.TweetText}, <i>${tweet.CreatedDate}</i></p>`
+            });
+            tweetFeed.innerHTML = tweethtml;
+        });
 }
 ```

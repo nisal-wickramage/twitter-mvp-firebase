@@ -21,6 +21,7 @@ var fileUploadElement = document.getElementById('uploadProfilePic');
 var profilePicElement = document.getElementById('profilepicture');
 var tweetTextbox = document.getElementById('tweettext');
 var tweetButton = document.getElementById('tweet');
+var tweetFeed = document.getElementById('tweetfeed');
 
 
 signInBtn.onclick = () => auth.signInWithPopup(provider);
@@ -31,10 +32,27 @@ tweetButton.onclick = () => saveTweet();
 
 fileUploadElement.addEventListener("change", uploadProfilePicture, false);
 
+function loadTweetFeed(uid) {
+    db.collection('Tweets')
+        .orderBy('CreatedDate', 'desc')
+        .limit(100)
+        .get()
+        .then(docs => {
+            var tweethtml = '';
+            docs.forEach(doc => {
+                var tweet = doc.data();
+                tweethtml = `${tweethtml}<p>${tweet.TweetText}, <i>${tweet.CreatedDate}</i></p>`
+            });
+            tweetFeed.innerHTML = tweethtml;
+        });
+}
+
 function saveTweet() {
     if(tweetTextbox.value) {
-        var tweet = {TweetText: tweetTextbox.value, UserId: userRef.uid};
-        db.collection('Tweets').add(tweet).then(()=> console.log('tweeted!'));
+        var tweet = {TweetText: tweetTextbox.value, UserId: userRef.uid, CreatedDate: new Date().toUTCString()};
+        db.collection('Tweets').add(tweet).then(()=> { 
+            tweetTextbox.value = '';
+            console.log('tweeted!')});
     }
 }
 
@@ -96,6 +114,7 @@ auth.onAuthStateChanged(user => {
         initProfileInfo(user.uid);
         updateButton.onclick = () => updateData(user.uid);
         userRef = user;
+        loadTweetFeed(user.uid);
     } else {
         signInBtn.hidden = false;
         userprofile.hidden = true;
