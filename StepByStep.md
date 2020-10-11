@@ -227,3 +227,6 @@ function loadTweetFeed(uid) {
         });
 }
 ```
+
+
+## Restricting storage and firestore operations
